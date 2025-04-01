@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suma de Matrices</title>
+    <script>
+        function generarMatrices() {
+            let filas = parseInt(document.getElementById("filas").value) || 0;
+            let columnas = parseInt(document.getElementById("columnas").value) || 0;
+            let contenedor = document.getElementById("matrices");
+            contenedor.innerHTML = "";
+            
+            for (let k = 1; k <= 2; k++) { //k es la cantidad de matrices que vamos a crear, en este ccaso dos nomas
+                let tabla = document.createElement("table");
+                tabla.innerHTML = `<caption>Matriz ${k}</caption>`; //caption es para agregar un titulo a la tabla 
+                for (let i = 0; i < filas; i++) {
+                    let fila = document.createElement("tr");
+                    for (let j = 0; j < columnas; j++) {
+                        let celda = document.createElement("td");
+                        let input = document.createElement("input");
+                        input.type = "number";
+                        input.id = `m${k}_${i}_${j}`;
+                        celda.appendChild(input); //agrega el input dentro de la celda 
+                        fila.appendChild(celda);// agrega lacelda dentreo de fila
+                    }
+                    tabla.appendChild(fila);
+                }
+                contenedor.appendChild(tabla);
+            }
+        }
+
+        async function sumarMatrices() {
+            let filas = parseInt(document.getElementById("filas").value) || 0;
+            let columnas = parseInt(document.getElementById("columnas").value) || 0;
+            let matriz1 = [], matriz2 = [];
+            
+            for (let i = 0; i < filas; i++) { //recorremos cada fila de la matriz
+                let fila1 = [], fila2 = []; // para cada matriz creaos una fila 
+                for (let j = 0; j < columnas; j++) { //recorremos cada columna
+                    fila1.push(Number(document.getElementById(`m1_${i}_${j}`).value) || 0);
+                    fila2.push(Number(document.getElementById(`m2_${i}_${j}`).value) || 0);
+                }
+                matriz1.push(fila1);
+                matriz2.push(fila2);
+            }
+            
+            let respuesta = await fetch("/sumar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ matriz1, matriz2 })
+            });
+            let datos = await respuesta.json();
+            mostrarResultado(datos.resultado);
+        }
+
+        function mostrarResultado(resultado) {
+            let contenedor = document.getElementById("resultado");
+            contenedor.innerHTML = "<h3>Resultado</h3>";
+            let tabla = document.createElement("table");
+            resultado.forEach(fila => {
+                let filaHTML = document.createElement("tr");
+                fila.forEach(valor => {
+                    let celda = document.createElement("td");
+                    celda.textContent = valor;
+                    filaHTML.appendChild(celda);
+                });
+                tabla.appendChild(filaHTML);
+            });
+            contenedor.appendChild(tabla);
+        }
+    </script>
+</head>
+<body>
+    <h1>Suma de Matrices</h1>
+    <label>Filas: <input type="number" id="filas" min="1"></label>
+    <label>Columnas: <input type="number" id="columnas" min="1"></label>
+    <button onclick="generarMatrices()">Generar Matrices</button>
+    <div id="matrices"></div>
+    <button onclick="sumarMatrices()">Sumar</button>
+    <div id="resultado"></div>
+</body>
+</html>
