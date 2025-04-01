@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(__name__, template_folder="public")  # Especifica que las plantillas están en la carpeta 'public'
+app = Flask(__name__, template_folder="public") # Especifica que las plantillas están en la carpeta 'public'
 
 @app.route('/')
 def index():
